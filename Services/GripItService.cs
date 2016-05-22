@@ -2,46 +2,42 @@ using System;
 using System.IO;
 using System.IO.Pipes;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace gripit_client
 {
     public class GripItService : IGripItService
     {
-        private IDisposable _observer;
         private const string PipeName = "gripit";
         private StreamReader _reader;
-        private IDisposable _dataSubscription;
         private NamedPipeClientStream _client;
+        private readonly Subject<ForceProjection> _forceProjectionSubject;
+        private IDisposable _forceProjectionSubscription;
 
-        public event NewForceProjectionEventHandler onNewForceProjection;
+        public IObservable<ForceProjection> OnNewForceProjection { get; private set; }
 
-        public IObservable<ForceProjection> OnNewForceProjection
+        public GripItService()
         {
-            get
-            {
-                return Observable.FromEventPattern<NewForceProjectionEventHandler, ForceProjection>(
-                    h => onNewForceProjection += h,
-                    h => onNewForceProjection -= h)
-                    .Select(x => x.EventArgs);
-            }
-        } 
+            _forceProjectionSubject = new Subject<ForceProjection>();
+            OnNewForceProjection = _forceProjectionSubject;
+        }
 
         public void Start()
         {
             _client = new NamedPipeClientStream(PipeName);
             _client.Connect();
             _reader = new StreamReader(_client);
-
-            _dataSubscription = Observable.Timer(TimeSpan.Zero, TimeSpan.FromMilliseconds(20))
-                .Select(_ => ReadData())
+            _forceProjectionSubscription = Observable.Timer(TimeSpan.Zero, TimeSpan.FromMilliseconds(20))
+                .Select(_ => new ForceProjection(ReadData()))
+                .Do(forceProjection => _forceProjectionSubject.OnNext(forceProjection))
                 .Subscribe();
         }
 
         public void Stop()
         {
-            _dataSubscription.Dispose();
-            _client.Dispose();
+            _forceProjectionSubscription?.Dispose();
             _reader.Close();
+            _client.Dispose();
         }
 
         private string ReadData()

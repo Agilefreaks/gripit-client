@@ -15,5 +15,13 @@ namespace gripit_client
             X = x;
             Y = y;
         }
+
+        public ForceProjection(string data)
+        {
+            var parts = data.Split(',');
+            Id = parts[0];
+            X = int.Parse(parts[1]);
+            Y = int.Parse(parts[2]);
+        }
     }
 }
