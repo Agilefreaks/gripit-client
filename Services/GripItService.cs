@@ -27,7 +27,7 @@ namespace gripit_client
             _client = new NamedPipeClientStream(PipeName);
             _client.Connect();
             _reader = new StreamReader(_client);
-            _forceProjectionSubscription = Observable.Timer(TimeSpan.Zero, TimeSpan.FromMilliseconds(20))
+            _forceProjectionSubscription = Observable.Timer(TimeSpan.Zero, TimeSpan.FromMilliseconds(100))
                 .Select(_ => new ForceProjection(ReadData()))
                 .Do(forceProjection => _forceProjectionSubject.OnNext(forceProjection))
                 .Subscribe();
