@@ -15,7 +15,7 @@ namespace gripit_client {
 
             container.Singleton<IWindowManager, WindowManager>();
             container.Singleton<IEventAggregator, EventAggregator>();
-            container.Singleton<IGripItService, MockGripItService>();
+            container.Singleton<IGripItService, GripItService>();
             container.PerRequest<IShell, ShellViewModel>();
         }
 
