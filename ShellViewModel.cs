@@ -159,11 +159,16 @@ namespace gripit_client {
         {
             GripItService.Stop();
             Started = false;
-            _animationSchedulerSubscription.Dispose();
+            if (_animationSchedulerSubscription != null)
+            {
+                _animationSchedulerSubscription.Dispose();
+                _animationSchedulerSubscription = null;
+            }
         }
 
-        public void Exit()
+        protected override void OnDeactivate(bool close)
         {
+            Stop();
             _disposable.Dispose();
             Application.Current.Shutdown();
         }
