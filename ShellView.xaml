@@ -9,20 +9,7 @@
             <Setter Property="Width" Value="100"></Setter>
         </Style>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <gripitClient:MultiplyConverter x:Key="MultiplyConverter" />
-<!--        <Style TargetType="{x:Type Line}">-->
-<!--            <Style.Triggers>-->
-<!--                <DataTrigger Binding="{Binding Path=IsAnimating}" Value="True">-->
-<!--                    <DataTrigger.EnterActions>-->
-<!--                        <BeginStoryboard>-->
-<!--                            <Storyboard>-->
-<!--                                <DoubleAnimation Storyboard.TargetProperty="X2" To="{Binding Path=ViewX}" />-->
-<!--                            </Storyboard>-->
-<!--                        </BeginStoryboard>-->
-<!--                    </DataTrigger.EnterActions>-->
-<!--                </DataTrigger>-->
-<!--            </Style.Triggers>-->
-<!--        </Style>-->
+        <gripitClient:MultiplyConverter x:Key="MultiplyConverter"/>
     </Window.Resources>
     <Grid Background="White">
         <Grid.RowDefinitions>
@@ -30,8 +17,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Button Content="Start" Height="50" x:Name="Start" Visibility="{Binding Path=Stopped, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <Button Content="Stop" Height="50" x:Name="Stop" Visibility="{Binding Path=Started, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <Button Grid.Row="0" Content="Start" Height="50" x:Name="Start" Visibility="{Binding Path=Stopped, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <Button Grid.Row="0" Content="Stop" Height="50" x:Name="Stop" Visibility="{Binding Path=Started, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <StackPanel Grid.Row="1" Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="X"></TextBlock>
@@ -57,7 +44,7 @@
                 </Path>
                 <Line Stroke="Black" X1="0" Y1="150" X2="300" Y2="150"  StrokeThickness="1"  />
                 <Line Stroke="Black" X1="150" Y1="0" X2="150" Y2="300"  StrokeThickness="1"  />
-                <Line x:Name="Vector" Stroke="Red" X1="150" Y1="150" X2="{Binding Path=ViewX}" Y2="{Binding Path=ViewY}" StrokeThickness="2" RenderTransformOrigin="0.5,0.5">
+                <Line x:Name="Vector" Stroke="Red" X1="150" Y1="150" X2="300" Y2="150" StrokeThickness="2" RenderTransformOrigin="0.5,0.5">
                 </Line>
             </Canvas>
         </Viewbox>

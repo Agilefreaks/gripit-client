@@ -1,8 +1,12 @@
 using System;
+using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Media.Animation;
+using System.Windows.Shapes;
+using Caliburn.Micro;
 
 namespace gripit_client {
-    public class ShellViewModel : Caliburn.Micro.PropertyChangedBase, IShell
+    public class ShellViewModel : Screen, IShell
     {
         #region fields
 
@@ -14,10 +18,14 @@ namespace gripit_client {
         private int _viewX;
         private int _viewY;
         private bool _isAnimating;
+        private IDisposable _animationSchedulerSubscription;
+        private Line _line;
         private const int _domainForValues = 10000;
         private const int _centerOffset = 5000;
         private const int _viewCenter = 150;
         private const int _maxAmplitude = 150;
+        private const int AnimationDuration = 200;
+        private const int RefreshInterval = 300;
 
         #endregion
 
@@ -38,7 +46,6 @@ namespace gripit_client {
                 {
                     X = args.X;
                     Y = args.Y;
-                    IsAnimating = true;
                 });
             }
         }
@@ -141,18 +148,45 @@ namespace gripit_client {
         {
             GripItService.Start();
             Started = true;
+            _animationSchedulerSubscription = Observable.Timer(TimeSpan.Zero, TimeSpan.FromMilliseconds(RefreshInterval))
+                .Do(_ => Application.Current.Dispatcher.Invoke(Animate))
+                .Select(_ => Observable.Timer(TimeSpan.FromMilliseconds(AnimationDuration)))
+                .Switch()
+                .Subscribe();
         }
 
         public void Stop()
         {
             GripItService.Stop();
             Started = false;
+            _animationSchedulerSubscription.Dispose();
         }
 
         public void Exit()
         {
             _disposable.Dispose();
             Application.Current.Shutdown();
+        }
+
+        protected override void OnViewAttached(object view, object context)
+        {
+            var shellView = (ShellView)view;
+            _line = (Line)shellView.FindName("Vector");
+            Animate();
+        }
+
+        private void Animate()
+        {
+            var storyboard = new Storyboard();
+            var anim1 = new DoubleAnimation(_line.X2, ViewX, TimeSpan.FromMilliseconds(AnimationDuration));
+            Storyboard.SetTarget(anim1, _line);
+            Storyboard.SetTargetProperty(anim1, new PropertyPath(Line.X2Property));
+            var anim2 = new DoubleAnimation(_line.Y2, ViewY, TimeSpan.FromMilliseconds(AnimationDuration));
+            Storyboard.SetTarget(anim2, _line);
+            Storyboard.SetTargetProperty(anim2, new PropertyPath(Line.Y2Property));
+            storyboard.Children.Add(anim1);
+            storyboard.Children.Add(anim2);
+            storyboard.Begin();
         }
     }
 }

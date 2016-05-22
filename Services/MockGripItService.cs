@@ -24,7 +24,7 @@ namespace gripit_client
         {
             var random = new Random();
             _observer = Observable
-                .Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(1))
+                .Timer(DateTimeOffset.Now, TimeSpan.FromMilliseconds(200))
                 .Subscribe(l => onNewForceProjection(this, new ForceProjection(random.Next(10000) - 5000, random.Next(10000) - 5000)));
         }
 
